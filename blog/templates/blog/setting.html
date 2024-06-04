@@ -1,0 +1,36 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<div id="settings-container" class="settings-container">
+    <h2>Account Settings</h2>
+    <div class="settings-links">
+        <a href="#" onclick="loadContent('update_profile')">Update Profile</a>
+        <a href="#" onclick="loadContent('change_password')">Change Password</a>
+        <a href="#" onclick="loadContent('update_email')">Update Email</a>
+        <a href="#" onclick="loadContent('delete_account')">Delete Account</a>
+    </div>
+    <div id="settings-content">
+        <!-- Content will be dynamically loaded here -->
+    </div>
+</div>
+
+<script>
+    function loadContent(action) {
+        fetch(`/settings?action=${action}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('settings-content').innerHTML = html;
+        })
+        .catch(error => console.error('Error loading content:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        loadContent('update_profile'); // Load default content
+    });
+</script>
+{% endblock content %}

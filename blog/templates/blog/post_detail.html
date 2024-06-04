@@ -1,0 +1,64 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<div class="post-detail-container">
+    <h2>{{ post.title }}</h2>
+    <p>by <a href="{% url 'user-posts' post.author.id %}">{{ post.author.get_full_name|default:post.author }}</a> on {{ post.date_posted }}</p>
+    <div class="post-content">
+        {{ post.content }}
+    </div>
+    {% if user == post.author %}
+        <div class="post-actions">
+            <a href="{% url 'edit-post' post.id %}" class="btn btn-secondary edit-button">
+                <i class="fas fa-edit"></i> Edit Post
+            </a>
+            <a href="{% url 'delete-post' post.id %}" class="btn btn-danger delete-button">
+                <i class="fas fa-trash-alt"></i> Delete Post
+            </a>
+        </div>
+    {% endif %}
+    <div class="like-section">
+        <span id="like-count-{{ post.id }}">{{ post.liked_by.count }} Likes</span>
+        {% if user.is_authenticated %}
+            <button class="btn btn-primary btn-sm like-button" data-post-id="{{ post.id }}">
+                <i class="fas fa-thumbs-up"></i>
+                {% if user in post.liked_by.all %}
+                    Dislike
+                {% else %}
+                    Like
+                {% endif %}
+            </button>
+        {% else %}
+            <button class="btn btn-primary btn-sm" disabled>
+                <i class="fas fa-thumbs-up"></i> Like
+            </button>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButton = document.querySelector('.like-button');
+    if (likeButton) {
+        likeButton.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            fetch(`{% url 'like-post' 0 %}`.replace('0', postId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.CSRF_TOKEN,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`like-count-${postId}`).innerText = `${data.like_count} Likes`;
+                this.innerHTML = data.liked ? '<i class="fas fa-thumbs-down"></i> Dislike' : '<i class="fas fa-thumbs-up"></i> Like';
+            });
+        });
+    }
+});
+</script>
+{% endblock extra_js %}

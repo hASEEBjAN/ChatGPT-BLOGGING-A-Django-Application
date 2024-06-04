@@ -1,0 +1,75 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+    <h2>
+        {% if posts and posts.first.author.first_name and posts.first.author.last_name %}
+            {{ posts.first.author.first_name }} {{ posts.first.author.last_name }}
+        {% else %}
+            {{ posts.first.author.username }}
+        {% endif %}'s Posts
+    </h2>
+    {% for post in posts %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <a class="mr-2 user-link" href="{% url 'blog-home' %}">
+                        {% if post.author.first_name and post.author.last_name %}
+                            {{ post.author.first_name }} {{ post.author.last_name }}
+                        {% else %}
+                            {{ post.author.username }}
+                        {% endif %}
+                    </a>
+                    <small class="text-muted">{{ post.date_posted }}</small>
+                </div>
+                <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+                <p class="article-content">{{ post.content }}</p>
+                <div class="like-section">
+                    <span id="like-count-{{ post.id }}">{{ post.liked_by.count }} Likes</span>
+                    {% if user.is_authenticated %}
+                        <button class="btn btn-primary btn-sm like-button" data-post-id="{{ post.id }}">
+                            {% if user in post.liked_by.all %}
+                                <i class="fas fa-thumbs-down"></i> Dislike
+                            {% else %}
+                                <i class="fas fa-thumbs-up"></i> Like
+                            {% endif %}
+                        </button>
+                    {% else %}
+                        <button class="btn btn-primary btn-sm" disabled><i class="fas fa-thumbs-up"></i> Like</button>
+                    {% endif %}
+                </div>
+            </div>
+        </article>
+    {% endfor %}
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.like-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const postId = this.getAttribute('data-post-id');
+            fetch(`{% url 'like-post' 0 %}`.replace('0', postId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.CSRF_TOKEN,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById(`like-count-${postId}`).innerText = `${data.like_count} Likes`;
+                this.innerHTML = data.liked ? '<i class="fas fa-thumbs-down"></i> Dislike' : '<i class="fas fa-thumbs-up"></i> Like';
+            });
+        });
+    });
+
+    document.querySelectorAll('.user-link').forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = "{% url 'blog-home' %}";
+        });
+    });
+});
+</script>
+{% endblock extra_js %}

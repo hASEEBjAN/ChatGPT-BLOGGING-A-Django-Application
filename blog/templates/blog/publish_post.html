@@ -1,0 +1,19 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+<div class="publish-post-container">
+    <h2>Publish a New Post</h2>
+    <form method="POST" action="{% url 'publish-post' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="content">Content</label>
+            <textarea class="form-control" id="content" name="content" rows="10" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Publish</button>
+    </form>
+</div>
+{% endblock content %}
