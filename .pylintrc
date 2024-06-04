@@ -1,8 +1,9 @@
-[pylint_django]
-django-settings-module=janchatgptblog.settings
-
 [MASTER]
 ignore=migrations
+ignore-patterns=*/migrations/*
+
+[pylint_django]
+django-settings-module=janchatgptblog.settings
 
 [TYPECHECK]
 disable=import-outside-toplevel
