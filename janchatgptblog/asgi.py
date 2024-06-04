@@ -11,8 +11,8 @@ import os
 
 try:
     from django.core.asgi import get_asgi_application
-except ImportError:
-    raise ImportError("Failed to import 'django.core.asgi'. Ensure Django is installed.")
+except ImportError as exc:
+    raise ImportError("Failed to import 'django.core.asgi'. Ensure Django is installed.") from exc
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'janchatgptblog.settings')
 
