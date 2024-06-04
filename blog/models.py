@@ -2,7 +2,10 @@
 
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import User
+# Recommended practice is to get the User model from django.contrib.auth.get_user_model()
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class Post(models.Model):
     """Model representing a blog post."""

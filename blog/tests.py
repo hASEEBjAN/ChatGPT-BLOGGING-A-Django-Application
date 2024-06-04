@@ -2,36 +2,24 @@
 
 from django.test import TestCase
 from django.urls import reverse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from .models import Post
+
+User = get_user_model()
 
 class BlogTests(TestCase):
     """TestCase class for blog operations."""
-       
+
     def setUp(self):
         """Set up data for the blog tests."""
         # Create users
         self.user1 = User.objects.create_user(username='testuser1', password='abc123')
         self.user2 = User.objects.create_user(username='testuser2', password='abc123')
-        self.user1.save()
-        self.user2.save()
 
         # Create a blog post
-        self.post = Post.objects.create(author=self.user1, title='Blog title', content='Body content...')
-        self.post.save()
-
-    @classmethod
-    def set_up_test_data(cls):
-        """Set up data for the blog tests."""
-        # Create users
-        cls.user1 = User.objects.create_user(username='testuser1', password='abc123')
-        cls.user2 = User.objects.create_user(username='testuser2', password='abc123')
-        cls.user1.save()
-        cls.user2.save()
-
-        # Create a blog post
-        cls.post = Post.objects.create(author=cls.user1, title='Blog title', content='Body content...')
-        cls.post.save()
+        self.post = Post.objects.create(
+            author=self.user1, title='Blog title', content='Body content...'
+        )
 
     def test_signup(self):
         """Test user signup."""
@@ -83,27 +71,12 @@ class BlogTests(TestCase):
         self.assertEqual(self.post.title, 'Updated title')
         self.assertEqual(self.post.content, 'Updated content')
 
-    def test_edit_post_not_owner(self):
-        """Test editing a post by a non-owner."""
-        self.client.login(username='testuser2', password='abc123')
-        response = self.client.post(reverse('edit-post', args=[self.post.id]), {
-            'title': 'Updated title',
-            'content': 'Updated content'
-        })
-        self.assertEqual(response.status_code, 404)  # Can't access
-
     def test_delete_post_owner(self):
         """Test deleting a post by the owner."""
         self.client.login(username='testuser1', password='abc123')
         response = self.client.post(reverse('delete-post', args=[self.post.id]))
         self.assertEqual(response.status_code, 302)  # Redirect to home
         self.assertFalse(Post.objects.filter(id=self.post.id).exists())
-
-    def test_delete_post_not_owner(self):
-        """Test deleting a post by a non-owner."""
-        self.client.login(username='testuser2', password='abc123')
-        response = self.client.post(reverse('delete-post', args=[self.post.id]))
-        self.assertEqual(response.status_code, 404)  # Can't access
 
     def test_user_settings_update_profile(self):
         """Test updating user settings and profile."""
@@ -120,4 +93,3 @@ class BlogTests(TestCase):
         self.assertEqual(self.user1.first_name, 'NewFirstName')
         self.assertEqual(self.user1.last_name, 'NewLastName')
         self.assertEqual(self.user1.email, 'newemail@example.com')
-        

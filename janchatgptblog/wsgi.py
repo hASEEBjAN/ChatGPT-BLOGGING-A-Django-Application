@@ -19,6 +19,5 @@ except ImportError:
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'janchatgptblog.settings')
 
 if get_wsgi_application:
+    # pylint: disable=C0103
     application = get_wsgi_application()
-else:
-    application = None
