@@ -1,18 +1,12 @@
 {% extends "blog/base.html" %}
 
 {% block content %}
-    <h2>
-        {% if posts and posts.first.author.first_name and posts.first.author.last_name %}
-            {{ posts.first.author.first_name }} {{ posts.first.author.last_name }}
-        {% else %}
-            {{ posts.first.author.username }}
-        {% endif %}'s Posts
-    </h2>
+    <h2>Posts tagged with '{{ tag_name }}'</h2>
     {% for post in posts %}
         <article class="media content-section">
             <div class="media-body">
                 <div class="article-metadata">
-                    <a class="mr-2 user-link" href="{% url 'blog-home' %}">
+                    <a class="mr-2 user-link" href="{% url 'user-posts' post.author.id %}">
                         {% if post.author.first_name and post.author.last_name %}
                             {{ post.author.first_name }} {{ post.author.last_name }}
                         {% else %}
@@ -69,13 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById(`like-count-${postId}`).innerText = `${data.like_count} Likes`;
                 this.innerHTML = data.liked ? '<i class="fas fa-thumbs-down"></i> Dislike' : '<i class="fas fa-thumbs-up"></i> Like';
             });
-        });
-    });
-
-    document.querySelectorAll('.user-link').forEach(link => {
-        link.addEventListener('click', function(event) {
-            event.preventDefault();
-            window.location.href = "{% url 'blog-home' %}";
         });
     });
 });

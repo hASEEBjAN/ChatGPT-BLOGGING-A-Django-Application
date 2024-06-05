@@ -5,7 +5,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Post, Profile
+from django.db import transaction
+from .models import Post, Profile, Tag
 
 
 def home(request):
@@ -96,13 +97,24 @@ def user_posts(request, user_id):
     context = {'posts': posts}
     return render(request, 'blog/user_posts.html', context)
 
+def tagged_posts(request, tag_name):
+    """Display all posts associated with a specific tag."""
+    posts = Post.objects.filter(tags__name=tag_name)
+    context = {'posts': posts, 'tag_name': tag_name}
+    return render(request, 'blog/tagged_posts.html', context)
+
 @login_required
 def publish_post(request):
     """Allow users to publish a new post."""
     if request.method == 'POST':
         title = request.POST['title']
         content = request.POST['content']
-        post = Post.objects.create(title=title, content=content, author=request.user)
+        tag_names = request.POST.get('tags', '').split(',')
+        with transaction.atomic():
+            post = Post.objects.create(title=title, content=content, author=request.user)
+            for tag_name in tag_names:
+                tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+                post.tags.add(tag)
         return redirect('post-detail', post_id=post.id)
     return render(request, 'blog/publish_post.html')
 
@@ -113,14 +125,15 @@ def edit_post(request, post_id):
     if request.method == 'POST':
         post.title = request.POST['title']
         post.content = request.POST['content']
+        post.tags.clear()
+        tag_names = request.POST.get('tags', '').split(',')
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+            post.tags.add(tag)
         post.save()
         return redirect('post-detail', post_id=post.id)
-    post.author_display = (
-        f"{post.author.first_name} {post.author.last_name}"
-        if post.author.first_name and post.author.last_name
-        else post.author.username
-    )
-    context = {'post': post}
+    existing_tags = ', '.join(tag.name for tag in post.tags.all())
+    context = {'post': post, 'existing_tags': existing_tags}
     return render(request, 'blog/edit_post.html', context)
 
 @login_required
