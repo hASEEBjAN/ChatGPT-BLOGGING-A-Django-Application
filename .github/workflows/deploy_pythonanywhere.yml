@@ -21,9 +21,8 @@ jobs:
               https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
     
       - name: Reload webapp
-        uses: jensvog/pythonanywhere-webapp-reload-action@v1
-        with:
-          host: 'www.pythonanywhere.com'
-          username: ${{ secrets.USERNAME }}
-          api-token: ${{ secrets.API_TOKEN }}
-          domain-name: ${{ secrets.DOMAIN_NAME }}
+        run: |
+          curl -X POST \
+              -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+              -d '' \
+              https://www.pythonanywhere.com//api/v0/user/${{ secrets.USERNAME }}/webapps/${{ secrets.DOMAIN_NAME }}/reload
