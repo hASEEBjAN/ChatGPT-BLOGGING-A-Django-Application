@@ -2,8 +2,9 @@ name: Deploy to PythonAnywhere
 
 on:
   push:
-    branches:
-      - deploy_pythonanywhere
+    branches: [ "deploy_pythonanywhere" ]
+  pull_request:
+    branches: [ "deploy_pythonanywhere" ]
 
 jobs:
   deploy:
