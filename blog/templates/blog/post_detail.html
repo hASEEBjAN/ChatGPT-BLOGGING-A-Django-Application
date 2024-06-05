@@ -3,36 +3,50 @@
 {% block content %}
 <div class="post-detail-container">
     <h2>{{ post.title }}</h2>
+    <br>
     <p>by <a href="{% url 'user-posts' post.author.id %}">{{ post.author.get_full_name|default:post.author }}</a> on {{ post.date_posted }}</p>
+    <br>
     <div class="post-content">
-        {{ post.content }}
+        {{ post.content|linebreaks }}
     </div>
-    {% if user == post.author %}
-        <div class="post-actions">
+    <br>
+    <div class="post-tags">
+        <strong>Tags:</strong>
+        {% for tag in post.tags.all %}
+            <a href="{% url 'tagged-posts' tag.name|urlencode %}" class="badge badge-secondary" style="color: white;">
+                {{ tag.name }}
+            </a>
+        {% endfor %}
+      </div>
+    <br>
+    <div class="post-actions">
+        {% if user == post.author %}
             <a href="{% url 'edit-post' post.id %}" class="btn btn-secondary edit-button">
                 <i class="fas fa-edit"></i> Edit Post
             </a>
+            &nbsp; <!-- Space between buttons -->
             <a href="{% url 'delete-post' post.id %}" class="btn btn-danger delete-button">
                 <i class="fas fa-trash-alt"></i> Delete Post
             </a>
-        </div>
-    {% endif %}
-    <div class="like-section">
-        <span id="like-count-{{ post.id }}">{{ post.liked_by.count }} Likes</span>
-        {% if user.is_authenticated %}
-            <button class="btn btn-primary btn-sm like-button" data-post-id="{{ post.id }}">
-                <i class="fas fa-thumbs-up"></i>
-                {% if user in post.liked_by.all %}
-                    Dislike
-                {% else %}
-                    Like
-                {% endif %}
-            </button>
-        {% else %}
-            <button class="btn btn-primary btn-sm" disabled>
-                <i class="fas fa-thumbs-up"></i> Like
-            </button>
+            &nbsp; <!-- Space between buttons -->
         {% endif %}
+        <div class="like-section" style="display: inline-block;">
+            <span id="like-count-{{ post.id }}">{{ post.liked_by.count }} Likes</span>
+            {% if user.is_authenticated %}
+                <button class="btn btn-primary btn-sm like-button" data-post-id="{{ post.id }}">
+                    <i class="fas fa-thumbs-up"></i>
+                    {% if user in post.liked_by.all %}
+                        Dislike
+                    {% else %}
+                        Like
+                    {% endif %}
+                </button>
+            {% else %}
+                <button class="btn btn-primary btn-sm" disabled>
+                    <i class="fas fa-thumbs-up"></i> Like
+                </button>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock content %}
