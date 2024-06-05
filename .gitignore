@@ -5,4 +5,8 @@ __pycache__/
 *.sqlite3
 blog/migrations
 .github/
-
+.github
+.gitignore
+*.sqlite3
+blog/migrations
+.github/
