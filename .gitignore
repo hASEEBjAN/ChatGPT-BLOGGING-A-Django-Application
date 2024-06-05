@@ -2,6 +2,9 @@ blog/__pycache__/
 janchatgptblog/__pycache__/
 __pycache__/
 *.pyc
+*.sqlite3
+blog/migrations
+.github/
 .github
 .gitignore
 *.sqlite3
