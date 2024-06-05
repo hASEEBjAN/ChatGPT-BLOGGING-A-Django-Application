@@ -17,7 +17,7 @@ jobs:
         run: |
           curl -X POST \
               -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
-              -d 'input=git pull' \
+              -d 'input=git pull%0A' \
               https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
     
       - name: Reload webapp
