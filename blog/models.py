@@ -2,11 +2,9 @@
 
 from django.db import models
 from django.utils import timezone
-# Recommended practice is to get the User model from django.contrib.auth.get_user_model()
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
 class Post(models.Model):
     """Model representing a blog post."""
     title = models.CharField(max_length=100)
@@ -31,5 +29,5 @@ class Profile(models.Model):
     profile_picture = models.ImageField(upload_to='profile_pics', blank=True)
 
     def __str__(self):
-        """Return the username as profile."""
+        """Return the username + profile."""
         return f'{self.user.username} Profile'
