@@ -11,11 +11,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-        
+
       - name: Reload webapp
         uses: jensvog/pythonanywhere-webapp-reload-action@v1
         with:
           host: 'www.pythonanywhere.com'
           username: ${{ secrets.USERNAME }}
-          api_token: ${{ secrets.API_TOKEN }}
-          domain_name: ${{ secrets.DOMAIN_NAME }}
+          api-token: ${{ secrets.API_TOKEN }}
+          domain-name: ${{ secrets.DOMAIN_NAME }}
