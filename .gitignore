@@ -1,4 +1,9 @@
 blog/__pycache__
+blog/migrations/
 janchatgptblog/__pycache__
+janchatgptblog/migrations/
 __pycache__/
 *.pyc
+*.sqlite3
+.github/
+.gitignore
