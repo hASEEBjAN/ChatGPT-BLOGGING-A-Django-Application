@@ -27,9 +27,9 @@ jobs:
         pip install -r requirements.txt
         pip install pylint pylint-django
     - name: Apply migrations
-      run: | 
-            python manage.py makemigrations
-            python manage.py migrate
+      run: |
+        python manage.py makemigrations
+        python manage.py migrate
     - name: Lint with Pylint
       run: |
         pylint --load-plugins pylint_django --rcfile=.pylintrc $(find . -name '*.py' ! -path "*/migrations/*")

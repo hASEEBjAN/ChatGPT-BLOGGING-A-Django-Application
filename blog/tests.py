@@ -3,7 +3,7 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from .models import Post
+from .models import Post, Tag
 
 User = get_user_model()
 
@@ -16,10 +16,15 @@ class BlogTests(TestCase):
         self.user1 = User.objects.create_user(username='testuser1', password='abc123')
         self.user2 = User.objects.create_user(username='testuser2', password='abc123')
 
-        # Create a blog post
+        # Create tags
+        self.tag1 = Tag.objects.create(name='Django')
+        self.tag2 = Tag.objects.create(name='Testing')
+
+        # Create a blog post with tags
         self.post = Post.objects.create(
             author=self.user1, title='Blog title', content='Body content...'
         )
+        self.post.tags.add(self.tag1, self.tag2)
 
     def test_signup(self):
         """Test user signup."""
