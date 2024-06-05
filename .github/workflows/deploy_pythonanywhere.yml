@@ -21,6 +21,8 @@ jobs:
           api_token: ${{ secrets.API_TOKEN }}
           domain_name: ${{ secrets.DOMAIN_NAME }}
           console_id:  ${{ secrets.CONSOLE_ID }}
+          virtual_env: ${{ secrets.VIRTUAL_ENV }}
+          directory: ${{ secrets.DIRECTORY }}
 
       - name: Reload webapp
         uses: jensvog/pythonanywhere-webapp-reload-action@v1
