@@ -12,21 +12,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Re-Deploy Pythonanywhere Django API
-        uses: umuttopalak/pythonanywhere-deploy-action@v1.0.0
-        with:
-          host: 'www.pythonanywhere.com'
-          username: ${{ secrets.USERNAME }}
-          api_token: ${{ secrets.API_TOKEN }}
-          domain_name: ${{ secrets.DOMAIN_NAME }}
-          console_id:  ${{ secrets.CONSOLE_ID }}
-          virtual_env: ${{ secrets.VIRTUAL_ENV }}
-          directory: ${{ secrets.DIRECTORY }}
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        
+      
+      - name: Pull latest code on PythonAnywhere
+        run: |
+          curl -X POST \
+              -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+              -d 'input=cd /home/engrhaseebjan/ChatGPT-BLOGGING-A-Django-Application %0Agit pull %0A' \
+              https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/{{ secrets.CONSOLE_ID }}/send_input/
+    
       - name: Reload webapp
         uses: jensvog/pythonanywhere-webapp-reload-action@v1
         with:
