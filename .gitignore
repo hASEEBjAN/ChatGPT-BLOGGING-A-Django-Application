@@ -2,3 +2,5 @@ blog/__pycache__
 janchatgptblog/__pycache__
 __pycache__/
 *.pyc
+.github
+.gitignore
