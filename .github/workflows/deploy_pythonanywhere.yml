@@ -16,7 +16,7 @@ jobs:
       - name: Re-Deploy Pythonanywhere Django API
         uses: umuttopalak/pythonanywhere-deploy-action@v1.0.0
         with:
-          host: 'www.pythonanywhere.com' # or 'www.eu.pythonanywhere.com' depending on your server location
+          host: 'www.pythonanywhere.com'
           username: ${{ secrets.USERNAME }}
           api_token: ${{ secrets.API_TOKEN }}
           domain_name: ${{ secrets.DOMAIN_NAME }}
@@ -24,6 +24,9 @@ jobs:
           virtual_env: ${{ secrets.VIRTUAL_ENV }}
           directory: ${{ secrets.DIRECTORY }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
       - name: Reload webapp
         uses: jensvog/pythonanywhere-webapp-reload-action@v1
         with:
