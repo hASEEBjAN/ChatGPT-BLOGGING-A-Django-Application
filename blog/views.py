@@ -5,8 +5,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import Post, Profile, Tag
 from django.db import transaction
+from .models import Post, Profile, Tag
 
 
 def home(request):

@@ -7,9 +7,11 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 class Tag(models.Model):
+    """Model representing a tag used in blog posts."""
     name = models.CharField(max_length=30, unique=True)
 
     def __str__(self):
+        """Return the name of the tag as its string representation."""
         return self.name
 class Post(models.Model):
     """Model representing a blog post."""
