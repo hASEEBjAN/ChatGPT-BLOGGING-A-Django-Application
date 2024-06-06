@@ -1,5 +1,5 @@
 """Module for handling views in the blog application."""
-
+from urllib.parse import unquote
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction
 from .models import Post, Profile, Tag
-
 
 def home(request):
     """Render the home page with a list of posts."""
@@ -28,6 +27,7 @@ def about(request):
 
 
 def signup(request):
+    """Handle user signup via a form submission."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -43,6 +43,7 @@ def signup(request):
 
 @login_required
 def additional_details(request):
+    """Render and process the form for users to add additional details to their profile."""
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name', user.first_name)
@@ -120,8 +121,6 @@ def user_posts(request, user_id):
         )
     context = {'posts': posts}
     return render(request, 'blog/user_posts.html', context)
-
-from urllib.parse import unquote
 
 def tagged_posts(request, tag_name):
     """Display all posts associated with a specific tag."""
