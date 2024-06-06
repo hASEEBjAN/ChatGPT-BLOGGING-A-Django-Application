@@ -3,8 +3,8 @@ janchatgptblog/__pycache__
 __pycache__/
 *.pyc
 *.sqlite3
-.github/
+.github
 .gitignore
 .*
-*.sqlite3
+db.sqlite3
 *.pyc.timestamp
