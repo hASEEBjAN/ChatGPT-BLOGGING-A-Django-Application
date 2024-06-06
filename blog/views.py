@@ -1,5 +1,5 @@
 """Module for handling views in the blog application."""
-
+from urllib.parse import unquote
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
@@ -121,6 +121,8 @@ def user_posts(request, user_id):
 
 def tagged_posts(request, tag_name):
     """Display all posts associated with a specific tag."""
+    # Decode the URL-encoded tag name
+    tag_name = unquote(tag_name)
     posts = Post.objects.filter(tags__name=tag_name)
     context = {'posts': posts, 'tag_name': tag_name}
     return render(request, 'blog/tagged_posts.html', context)
