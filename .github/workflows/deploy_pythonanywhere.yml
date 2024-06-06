@@ -11,16 +11,37 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
-      - name: Pull latest code on PythonAnywhere
+
+      - name: Create new console
+        run: |
+          response=$(curl -X POST \
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            -d 'executable=/bin/bash&arguments=&working_directory=/home/${{ secrets.USERNAME }}/ChatGPT-BLOGGING-A-Django-Application/' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/)
+          echo "console_id=$(echo $response | jq -r '.id')" >> $GITHUB_ENV
+
+      - name: Checkout branch on new console
         run: |
           curl -X POST \
-              -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
-              -d 'input=git pull%0A' \
-              https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
-    
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            -d 'input=git checkout deploy_pythonanywhere%0A' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ env.console_id }}/send_input/
+
+      - name: Pull latest code on new console
+        run: |
+          curl -X POST \
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            -d 'input=git pull%0A' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ env.console_id }}/send_input/
+
+      - name: Kill the new console
+        run: |
+          curl -X DELETE \
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ env.console_id }}/
+
       - name: Reload webapp
         run: |
           curl -X POST \
-              -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
-              https://www.pythonanywhere.com//api/v0/user/${{ secrets.USERNAME }}/webapps/${{ secrets.DOMAIN_NAME }}/reload
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/webapps/${{ secrets.DOMAIN_NAME }}/reload
