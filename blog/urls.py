@@ -21,5 +21,5 @@ urlpatterns = [
     path('settings/update_email/', views.handle_email_update, name='handle-email-update'),
     path('settings/delete_account/', views.handle_account_delete, name='handle-account-delete'),
     path('tags/<path:tag_name>/', views.tagged_posts, name='tagged-posts'),
-path('additional-details/', views.additional_details, name='additional-details')
+    path('additional-details/', views.additional_details, name='additional-details')
 ]
