@@ -3,7 +3,7 @@ name: Deploy to PythonAnywhere
 on:
   push:
     branches:
-      - deploy_pythonanywhere
+      - main
 
 jobs:
   deploy:
@@ -12,34 +12,40 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Create new console
-        run: |
-          response=$(curl -X POST \
-            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
-            -d 'executable=/bin/bash&arguments=&working_directory=/home/${{ secrets.USERNAME }}/ChatGPT-BLOGGING-A-Django-Application/' \
-            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/)
-          console_id=$(echo $response | jq -r '.id')
-          echo "console_id=$console_id" >> $GITHUB_ENV
-
-      - name: Checkout branch on new console
+      - name: Change directory using cd.
         run: |
           curl -X POST \
             -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
-            -d 'input=git checkout deploy_pythonanywhere%0A' \
-            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ env.console_id }}/send_input/
+            -d 'input=cd /home/${{ secrets.USERNAME }}/ChatGPT-BLOGGING-A-Django-Application%0A' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
+              
+      - name: Checkout branch to main
+        run: |
+          curl -X POST \
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            -d 'input=git checkout main%0A' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
 
-      - name: Pull latest code on new console
+      - name: Pull latest code 
         run: |
           curl -X POST \
             -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
             -d 'input=git pull%0A' \
-            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ env.console_id }}/send_input/
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
 
-      - name: Kill the new console
+      - name: make migrations
         run: |
-          curl -X DELETE \
+          curl -X POST \
             -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
-            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ env.console_id }}/
+            -d 'input=python manage.py makemigrations%0Apython manage.py makemigrations blog%0A' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
+ 
+      - name: Migrate
+        run: |
+          curl -X POST \
+            -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
+            -d 'input=python manage.py migrate%0Apython manage.py migrate blog%0A' \
+            https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/${{ secrets.CONSOLE_ID }}/send_input/
 
       - name: Reload webapp
         run: |
