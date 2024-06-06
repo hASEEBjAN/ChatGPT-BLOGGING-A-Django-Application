@@ -18,7 +18,8 @@ jobs:
             -H 'Authorization: Token ${{ secrets.API_TOKEN }}' \
             -d 'executable=/bin/bash&arguments=&working_directory=/home/${{ secrets.USERNAME }}/ChatGPT-BLOGGING-A-Django-Application/' \
             https://www.pythonanywhere.com/api/v0/user/${{ secrets.USERNAME }}/consoles/)
-          echo "console_id=$(echo $response | jq -r '.id')" >> $GITHUB_ENV
+          console_id=$(echo $response | jq -r '.id')
+          echo "console_id=$console_id" >> $GITHUB_ENV
 
       - name: Checkout branch on new console
         run: |
