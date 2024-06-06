@@ -3,9 +3,9 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 
 User = get_user_model()
-
 class Tag(models.Model):
     """Model representing a tag used in blog posts."""
     name = models.CharField(max_length=30, unique=True)
@@ -36,6 +36,7 @@ class Profile(models.Model):
     phone = models.CharField(max_length=15, blank=True)
     address = models.CharField(max_length=255, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics', blank=True)
+    liked_tags = models.ManyToManyField('Tag', related_name='liked_by')
 
     def __str__(self):
         """Return the username + profile."""

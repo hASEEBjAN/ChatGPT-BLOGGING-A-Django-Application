@@ -20,5 +20,6 @@ urlpatterns = [
     path('settings/change_password/', views.handle_password_change, name='handle-password-change'),
     path('settings/update_email/', views.handle_email_update, name='handle-email-update'),
     path('settings/delete_account/', views.handle_account_delete, name='handle-account-delete'),
-    path('tags/<path:tag_name>/', views.tagged_posts, name='tagged-posts')
+    path('tags/<path:tag_name>/', views.tagged_posts, name='tagged-posts'),
+path('additional-details/', views.additional_details, name='additional-details')
 ]
