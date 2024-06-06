@@ -5,8 +5,8 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.db import transaction
-from .models import Post, Profile, Tag
+from django.db import transaction, IntegrityError
+from .models import Post, Profile, Tag, User
 
 def home(request):
     """Render the home page with a list of posts."""
@@ -28,17 +28,20 @@ def about(request):
 def signup(request):
     """Handle user signup via a form."""
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('additional-details')  # Redirect here
-    else:
-        form = UserCreationForm()
-    return render(request, 'blog/signup.html', {'form': form})
+        username = request.POST.get('username')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+        if password1 and password1 == password2:
+            try:
+                user = User.objects.create_user(username=username, password=password1)
+                login(request, user)
+                return redirect('additional-details')  # Redirect to additional details or home
+            except IntegrityError:
+                return render(request, 'blog/signup.html', {'error': 'Username already exists'})
+        else:
+            return render(request, 'blog/signup.html', {'error': 'Passwords do not match'})
+
+    return render(request, 'blog/signup.html')
 
 @login_required
 def additional_details(request):
