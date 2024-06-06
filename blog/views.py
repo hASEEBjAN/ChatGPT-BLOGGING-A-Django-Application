@@ -26,6 +26,7 @@ def about(request):
     return render(request, 'blog/about.html', {'title': 'About'})
 
 def signup(request):
+    """Handle user signup via a form."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -41,6 +42,7 @@ def signup(request):
 
 @login_required
 def additional_details(request):
+    """Handle additional profile detail of user on signup via a form."""
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name', user.first_name)
