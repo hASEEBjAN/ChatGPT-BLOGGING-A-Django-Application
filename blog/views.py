@@ -28,7 +28,6 @@ def about(request):
 
 
 def signup(request):
-    """Handle user signup."""
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
@@ -37,11 +36,36 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-            return redirect('blog-home')
+            return redirect('additional-details')  # Redirect here
     else:
         form = UserCreationForm()
     return render(request, 'blog/signup.html', {'form': form})
 
+@login_required
+def additional_details(request):
+    if request.method == 'POST':
+        user = request.user
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.email = request.POST.get('email', user.email)
+        user.save()
+
+        profile, _ = Profile.objects.get_or_create(user=user)
+        profile.profile_picture = request.FILES.get('profile_picture')
+        profile.phone = request.POST.get('phone', profile.phone)
+        profile.address = request.POST.get('address', profile.address)
+        profile.save()
+
+        tags = request.POST.get('tags', '')
+        tag_names = [tag.strip() for tag in tags.split(',') if tag.strip()]
+        profile.liked_tags.clear()  # Clear existing tags before adding new ones
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            profile.liked_tags.add(tag)
+
+        return redirect('blog-home')
+
+    return render(request, 'blog/additional_details.html')
 
 def login_view(request):
     """Handle user login."""
@@ -97,8 +121,12 @@ def user_posts(request, user_id):
     context = {'posts': posts}
     return render(request, 'blog/user_posts.html', context)
 
+from urllib.parse import unquote
+
 def tagged_posts(request, tag_name):
     """Display all posts associated with a specific tag."""
+    # Decode the URL-encoded tag name
+    tag_name = unquote(tag_name)
     posts = Post.objects.filter(tags__name=tag_name)
     context = {'posts': posts, 'tag_name': tag_name}
     return render(request, 'blog/tagged_posts.html', context)
@@ -210,7 +238,7 @@ def handle_account_delete(request):
 
 @login_required
 def handle_profile_update(request):
-    """Allow users to update their profile information."""
+    """Allow users to update their profile information including liked tags."""
     if request.method == 'POST':
         user = request.user
         user.first_name = request.POST.get('first_name')
@@ -222,6 +250,14 @@ def handle_profile_update(request):
         profile.address = request.POST.get('address')
         if 'profile_picture' in request.FILES:
             profile.profile_picture = request.FILES['profile_picture']
+
+        # Handling tag updates
+        tags = request.POST.get('tags', '')
+        tag_names = [tag.strip() for tag in tags.split(',') if tag.strip()]
+        profile.liked_tags.clear()  # Clear existing tags before adding new ones
+        for tag_name in tag_names:
+            tag, _ = Tag.objects.get_or_create(name=tag_name)
+            profile.liked_tags.add(tag)
 
         user.save()
         profile.save()
