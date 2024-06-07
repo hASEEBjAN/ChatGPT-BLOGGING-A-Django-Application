@@ -10,10 +10,16 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, 'subdir')
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+
+# Ensure the correct import path for the BlogContentGenerator
+sys.path.append(str(BASE_DIR / 'blog'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/

@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction, IntegrityError
 from .models import Post, Profile, Tag, User
+from .GPT_Blog_generator.openai_integration import BlogContentGenerator
 
 def home(request):
     """Render the home page with a list of posts."""
@@ -70,17 +71,21 @@ def additional_details(request):
     return render(request, 'blog/additional_details.html')
 
 def login_view(request):
-    """Handle user login."""
+    """Handle user login and generate a blog post on successful login."""
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            # Generate a blog post using the BlogContentGenerator
+            generator = BlogContentGenerator()
+            blog_content = generator.generate_blog_content("Welcome to our new user, here's a custom blog post for you!")
+            # Create a new post as the first user
+            Post.objects.create(author=user, title="Welcome New User!", content=blog_content)
             return redirect('blog-home')
         return render(request, 'blog/login.html', {'error': 'Invalid username or password'})
     return render(request, 'blog/login.html')
-
 
 def logout_view(request):
     """Handle user logout."""
