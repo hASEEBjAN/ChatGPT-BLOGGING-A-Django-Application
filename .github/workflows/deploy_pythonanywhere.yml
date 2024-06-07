@@ -30,6 +30,8 @@ jobs:
           python manage.py migrate
           
       - name: Lint with Pylint
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           pylint --load-plugins pylint_django --rcfile=.pylintrc $(find . -name '*.py' ! -path "*/migrations/*")
   
