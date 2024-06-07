@@ -2,7 +2,7 @@
 Module to integrate OpenAI's GPT models for generating blog content within a Django application.
 """
 import os
-from openai import OpenAI
+from openai import OpenAI 
 from django.conf import settings
 
 class BlogContentGenerator:
@@ -49,17 +49,13 @@ class BlogContentGenerator:
             str: The generated blog content.
         """
         system_message = self.load_system_message('blog/gpt_blog_generator/system_message.txt')
-        try:
-            response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": system_message},
-                    {"role": "user", "content": prompt}
-                ])
-            print(prompt)
-            return response.choices[0].message.content
-        except Exception as specific_error:
-            return f"Failed to generate blog content: {str(specific_error)}"
+        response = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt}
+            ])
+        return response.choices[0].message.content
 
     def __str__(self):
         """
