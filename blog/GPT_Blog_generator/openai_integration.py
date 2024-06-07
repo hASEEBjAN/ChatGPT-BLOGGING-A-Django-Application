@@ -1,4 +1,5 @@
 from openai import OpenAI
+from django.conf import settings
 
 class BlogContentGenerator:
     def __init__(self, engine="text-davinci-002", max_tokens=500):
@@ -11,9 +12,9 @@ class BlogContentGenerator:
         """
         self.engine = engine
         self.max_tokens = max_tokens
-        # if not settings.OPENAI_API_KEY:
-        #     raise ValueError("OPENAI_API_KEY is not set in settings.")
-        self.client = OpenAI(api_key='sk-proj-pGnSzZLDOdas03ZqUrsST3BlbkFJ0roywyZZUaJz4QlJ7MQ5')
+        if not settings.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY is not set in settings.")
+        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
     def generate_blog_content(self, prompt):
         """
