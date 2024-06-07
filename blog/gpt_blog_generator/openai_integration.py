@@ -2,7 +2,7 @@
 Module to integrate OpenAI's GPT models for generating blog content within a Django application.
 """
 import os
-from openai import OpenAI 
+from openai import OpenAI
 from django.conf import settings
 
 class BlogContentGenerator:
