@@ -1,7 +1,7 @@
 from openai import OpenAI
 from django.conf import settings
 
-class Blog_Content_Generator:
+class BlogContentGenerator:
     """
     A class to generate blog content using OpenAI's GPT models.
     """
@@ -30,7 +30,10 @@ class Blog_Content_Generator:
             str: The generated blog content.
         """
         system_message = (
-            "You are a helpful blog writing assistant. You will be creating a blog using specific title, tags, and content relevant to the tags provided by the user. The user prompt will only have a list of tags. The format of your response will be:\n\n"
+            "You are a helpful blog writing assistant."
+            "You will be creating a blog using specific title," 
+            "tags, and content relevant to the tags provided by the user." 
+            "The user prompt will only have a list of tags. The format of your response will be:\n\n"
             "```\n"
             "Title: <title>\n"
             "Tags: <tags>\n"
@@ -40,10 +43,15 @@ class Blog_Content_Generator:
             "* There should be no double quoted titles.\n"
             "* There should be no double quoted tags.\n"
             "* The content will also be not in a double quoted.\n"
-            "* Try to include, exclude, or always do changes in one or two tags from the list of tags provided by the user as well as in the blog.\n"
-            "* The tags should be a list of tags that are relevant to the content of the blog post.\n"
-            "* The title should be a concise and descriptive title that captures the essence of the blog post.\n"
-            "* The content should be a detailed and comprehensive content that captures the essence of the blog post."
+            "* Try to include, exclude, or always do changes" 
+            "in one or two tags from the list of tags provided" 
+            "by the user as well as in the blog.\n"
+            "* The tags should be a list of tags that are relevant" 
+            "to the content of the blog post.\n"
+            "* The title should be a concise and descriptive title that" 
+            "captures the essence of the blog post.\n"
+            "* The content should be a detailed and comprehensive content" 
+            "that captures the essence of the blog post."
         )
         try:
             response = self.client.chat.completions.create(

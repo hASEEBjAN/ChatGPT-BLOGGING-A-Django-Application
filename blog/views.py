@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction, IntegrityError
 from .models import Post, Profile, Tag, User
-from .GPT_Blog_generator.openai_integration import Blog_Content_Generator
+from .GPTBlogGenerator.openaiIntegration import BlogContentGenerator
 
 def home(request):
     """Render the home page with a list of posts."""
@@ -84,30 +84,23 @@ def login_view(request):
 
     login(request, user)
     # Extract tags from the user's liked tags
-    user_tags = ','.join(tag.name for tag in user.profile.liked_tags.all())
-    # Generate a blog post using the BlogContentGenerator with user's tags as prompt
-    generator = Blog_Content_Generator()
-    blog_content = generator.generate_blog_content(user_tags)
-    print(blog_content)
+    blog_content = BlogContentGenerator().generate_blog_content(
+        ','.join(tag.name for tag in user.profile.liked_tags.all())
+    )
     # Use regex to extract title, tags, and content
-    title_pattern = r"Title: (.+)"
-    tags_pattern = r"Tags: (.+)"
-    content_pattern = r"\n\n([\s\S]+)"
-
-    title_match = re.search(title_pattern, blog_content)
-    tags_match = re.search(tags_pattern, blog_content)
-    content_match = re.search(content_pattern, blog_content)
+    title_match = re.search(r"Title: (.+)", blog_content)
+    tags_match = re.search(r"Tags: (.+)", blog_content)
+    content_match = re.search(r"\n\n([\s\S]+)", blog_content)
 
     if not (title_match and tags_match and content_match):
         return render(request, 'blog/login.html', {'error': 'Error generating post content'})
 
-    title = title_match.group(1)
-    tags = tags_match.group(1).split(', ')
-    content = content_match.group(1)
-
     # Create a new post with the extracted title and content
-    post = Post.objects.create(author=user, title=title, content=content)
-    for tag_name in tags:
+    post = Post.objects.create(author=user, 
+                               title=title_match.group(1), 
+                               content=content_match.group(1))
+    
+    for tag_name in tags_match.group(1).split(', '):
         tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
         post.tags.add(tag)
 
