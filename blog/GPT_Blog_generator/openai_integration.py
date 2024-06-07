@@ -1,7 +1,7 @@
 from openai import OpenAI
 from django.conf import settings
 
-class BlogContentGenerator:
+class Blog_Content_Generator:
     """
     A class to generate blog content using OpenAI's GPT models.
     """

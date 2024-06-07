@@ -88,7 +88,7 @@ def login_view(request):
     # Generate a blog post using the BlogContentGenerator with user's tags as prompt
     generator = Blog_Content_Generator()
     blog_content = generator.generate_blog_content(user_tags)
-
+    print(blog_content)
     # Use regex to extract title, tags, and content
     title_pattern = r"Title: (.+)"
     tags_pattern = r"Tags: (.+)"
