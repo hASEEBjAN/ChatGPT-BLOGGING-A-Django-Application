@@ -5,7 +5,7 @@ import os
 from openai import OpenAI
 from django.conf import settings
 
-class blog_content_generator:
+class BlogContentGenerator:
     """
     A class to generate blog content using OpenAI's GPT models.
     """
@@ -35,7 +35,7 @@ class blog_content_generator:
         """
         if not os.path.exists(file_path):
             raise FileNotFoundError(f"The file {file_path} does not exist.")
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
 
     def generate_blog_content(self, prompt):
@@ -56,10 +56,10 @@ class blog_content_generator:
                     {"role": "system", "content": system_message},
                     {"role": "user", "content": prompt}
                 ])
-            print(prompt) 
+            print(prompt)
             return response.choices[0].message.content
-        except Exception as e:
-            return f"Failed to generate blog content: {str(e)}"
+        except Exception as specific_error:
+            return f"Failed to generate blog content: {str(specific_error)}"
 
     def __str__(self):
         """
