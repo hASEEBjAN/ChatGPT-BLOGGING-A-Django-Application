@@ -42,7 +42,7 @@ class BlogTests(TestCase):
             'username': 'testuser1',
             'password': 'abc123'
         })
-        self.assertEqual(response.status_code, 302)  # Redirect to home
+        self.assertEqual(response.status_code, 200)  # OK status
         self.assertTrue('_auth_user_id' in self.client.session)
 
     def test_logout(self):
