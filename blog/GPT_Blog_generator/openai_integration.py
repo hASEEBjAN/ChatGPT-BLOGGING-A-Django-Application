@@ -14,7 +14,7 @@ class BlogContentGenerator:
         self.max_tokens = max_tokens
         # if not settings.OPENAI_API_KEY:
         #     raise ValueError("OPENAI_API_KEY is not set in settings.")
-        self.client = OpenAI(api_key='sk-proj-pGnSzZLDOdas03ZqUrsST3BlbkFJ0roywyZZUaJz4QlJ7MQ5')
+        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
 
     def generate_blog_content(self, prompt):
         """
