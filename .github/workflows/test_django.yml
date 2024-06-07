@@ -15,6 +15,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Check API Key Length
+      run: echo "API Key Length: ${#OPENAI_API_KEY}"
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
