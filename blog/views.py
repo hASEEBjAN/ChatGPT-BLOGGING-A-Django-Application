@@ -1,4 +1,5 @@
 """Module for handling views in the blog application."""
+import re
 from urllib.parse import unquote
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
@@ -6,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction, IntegrityError
 from .models import Post, Profile, Tag, User
+from .GPT_Blog_generator.openai_integration import BlogContentGenerator
 
 def home(request):
     """Render the home page with a list of posts."""
@@ -70,17 +72,44 @@ def additional_details(request):
     return render(request, 'blog/additional_details.html')
 
 def login_view(request):
-    """Handle user login."""
+    """Handle user login and generate a blog post on successful login."""
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('blog-home')
+            # Extract tags from the user's liked tags
+            user_tags = ','.join(tag.name for tag in user.profile.liked_tags.all())
+            # Generate a blog post using the BlogContentGenerator with user's tags as prompt
+            generator = BlogContentGenerator()
+            blog_content = generator.generate_blog_content(user_tags)
+            
+            # Use regex to extract title, tags, and content
+            title_pattern = r"Title: (.+)"
+            tags_pattern = r"Tags: (.+)"
+            content_pattern = r"\n\n([\s\S]+)"
+            
+            title_match = re.search(title_pattern, blog_content)
+            tags_match = re.search(tags_pattern, blog_content)
+            content_match = re.search(content_pattern, blog_content)
+            
+            if title_match and tags_match and content_match:
+                title = title_match.group(1)
+                tags = tags_match.group(1).split(', ')
+                content = content_match.group(1)
+                
+                # Create a new post with the extracted title and content
+                post = Post.objects.create(author=user, title=title, content=content)
+                for tag_name in tags:
+                    tag, _ = Tag.objects.get_or_create(name=tag_name.strip())
+                    post.tags.add(tag)
+                
+                return redirect('blog-home')
+            else:
+                return render(request, 'blog/login.html', {'error': 'Error generating post content'})
         return render(request, 'blog/login.html', {'error': 'Invalid username or password'})
     return render(request, 'blog/login.html')
-
 
 def logout_view(request):
     """Handle user logout."""
