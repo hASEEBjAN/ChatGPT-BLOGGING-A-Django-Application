@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.db import transaction, IntegrityError
 from .models import Post, Profile, Tag, User
-from .GPTBlogGenerator.openaiIntegration import BlogContentGenerator
+from .gpt_blog_generator.openai_integration import blog_content_generator
 
 def home(request):
     """Render the home page with a list of posts."""
@@ -84,7 +84,7 @@ def login_view(request):
 
     login(request, user)
     # Extract tags from the user's liked tags
-    blog_content = BlogContentGenerator().generate_blog_content(
+    blog_content = blog_content_generator().generate_blog_content(
         ','.join(tag.name for tag in user.profile.liked_tags.all())
     )
     # Use regex to extract title, tags, and content
